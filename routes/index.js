@@ -1,4 +1,3 @@
-const cube = require('../controllers/cube');
 const cubeController = require('../controllers/cube');
 
 module.exports = (app) => {
@@ -25,7 +24,8 @@ module.exports = (app) => {
 	app.get('/details/:id', async (req, res) => {
 		const id = req.params.id;
 		const cube = await cubeController.getCubeById(id);
-		res.render('details', { ...cube });
+		console.log(cube);
+		res.render('details', cube);
 	});
 	app.get('*', (req, res) => {
 		res.render('404');

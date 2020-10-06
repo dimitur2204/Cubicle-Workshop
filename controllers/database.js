@@ -1,35 +1,41 @@
-const fs = require('fs');
-const path = require('path');
-const util = require('util');
-const pathToDB = path.resolve('./config/database.json');
-const getAllCubes = () => {
-	const readFilePromise = util.promisify(fs.readFile);
-	return readFilePromise(pathToDB, { encoding: 'utf-8' })
-		.then((data) => JSON.parse(data))
-		.catch((err) => {
-			console.error(err);
-		});
+const mongoose = require('mongoose');
+const Cube = require('../models/cube-model');
+const connectionString = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cubicle-workshop.cmgb5.mongodb.net/cubicle-workshop?retryWrites=true&w=majority`;
+
+mongoose.connect(connectionString);
+
+const getAllCubes = async () => {
+	let result;
+	try {
+		result = await Cube.find({});
+	} catch (err) {
+		throw err;
+	}
+	return result;
 };
 
 const getCubeById = async (id) => {
-	const cubes = await getAllCubes();
-	return cubes.find((c) => c.id === id);
+	let result;
+	try {
+		result = await Cube.findById(id).select(
+			'_id name difficulty description imageUrl'
+		);
+	} catch (err) {
+		throw err;
+	}
+	return result;
 };
-
-const addNewCube = async (cube) => {
-	const cubes = await getAllCubes();
-	cubes.push(cube);
-	return util.promisify(
-		fs.writeFile(pathToDB, JSON.stringify(cubes), (err) => {
-			if (err) {
-				Promise.reject(err);
-			}
-		})
-	);
+const findByQueryObj = async (queryObj) => {
+	let result;
+	try {
+		result = await Cube.find(queryObj);
+	} catch (err) {
+		throw err;
+	}
+	return result;
 };
-
 module.exports = {
 	getCubeById,
 	getAllCubes,
-	addNewCube,
+	findByQueryObj,
 };
