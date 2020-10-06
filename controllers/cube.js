@@ -8,7 +8,7 @@ const getCubes = async (query) => {
 	let cubes;
 	cubes = db.findByQueryObj({
 		name: {
-			$regex: search || '.*',
+			$regex: new RegExp(search, 'i') || '.*',
 		},
 		difficulty: {
 			$gte: from || 0,
