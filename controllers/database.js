@@ -17,7 +17,9 @@ const getAllCubes = async () => {
 const getCubeById = async (id) => {
 	let result;
 	try {
-		result = await Cube.findById(id);
+		result = await Cube.findById(id).select(
+			'_id name difficulty description imageUrl'
+		);
 	} catch (err) {
 		throw err;
 	}
