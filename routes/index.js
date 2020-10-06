@@ -1,9 +1,9 @@
-const cube = require('../controllers/cube');
 const cubeController = require('../controllers/cube');
 
 module.exports = (app) => {
 	app.get('/', async (req, res) => {
 		const cubes = await cubeController.getCubes(req.query);
+		console.log(cubes);
 		res.render('index', { cubes });
 	});
 	app.get('/about', (req, res) => {
