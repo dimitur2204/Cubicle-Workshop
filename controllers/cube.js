@@ -1,5 +1,6 @@
 const Cube = require('../models/cube-model');
 const db = require('../controllers/database');
+const accessory = require('./accessory');
 
 const getCubes = async (query) => {
 	const search = query.search;
@@ -17,10 +18,12 @@ const getCubes = async (query) => {
 	});
 	return cubes;
 };
+
 const getCubeById = async (id) => {
 	const cube = db.getCubeById(id);
 	return cube;
 };
+
 const createCube = (name, description, imageUrl, difficulty) => {
 	const cube = new Cube({
 		name,
