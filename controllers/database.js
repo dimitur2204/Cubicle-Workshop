@@ -1,13 +1,40 @@
 const mongoose = require('mongoose');
+const Accessory = require('../models/accessory-model');
 const Cube = require('../models/cube-model');
+const accessory = require('./accessory');
 const connectionString = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cubicle-workshop.cmgb5.mongodb.net/cubicle-workshop?retryWrites=true&w=majority`;
 
-mongoose.connect(connectionString);
+mongoose.connect(connectionString, {
+	useNewUrlParser: true,
+	useUnifiedTopology: true,
+});
 
 const getAllCubes = async () => {
 	let result;
 	try {
 		result = await Cube.find({});
+	} catch (err) {
+		throw err;
+	}
+	return result;
+};
+
+const getAllAccessories = async () => {
+	let result;
+	try {
+		result = await Accessory.find({});
+	} catch (err) {
+		throw err;
+	}
+	return result;
+};
+
+const getAccessoryById = async (id) => {
+	let result;
+	try {
+		result = await Accessory.findById(id).select(
+			'_id name description imageUrl'
+		);
 	} catch (err) {
 		throw err;
 	}
@@ -25,6 +52,7 @@ const getCubeById = async (id) => {
 	}
 	return result;
 };
+
 const findByQueryObj = async (queryObj) => {
 	let result;
 	try {
@@ -34,8 +62,17 @@ const findByQueryObj = async (queryObj) => {
 	}
 	return result;
 };
+
+const getAccessoriesForCube = async (cubeId) => {
+	const cube = await getCubeById(cubeId).populate('accessories');
+	return cube.accessories;
+};
+
 module.exports = {
 	getCubeById,
 	getAllCubes,
 	findByQueryObj,
+	getAllAccessories,
+	getAccessoryById,
+	getAccessoriesForCube,
 };
