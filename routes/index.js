@@ -3,6 +3,7 @@ const {
 	attachAccessory,
 } = require('../controllers/accessory');
 const cubeController = require('../controllers/cube');
+const accController = require('../controllers/accessory');
 const Accessory = require('../models/accessory-model');
 
 module.exports = (app) => {
@@ -22,15 +23,23 @@ module.exports = (app) => {
 	app.post('/create/accessory', (req, res) => {
 		const { name, description, imageUrl } = req.body;
 		const acc = new Accessory({ name, description, imageUrl });
-		console.log(acc);
+
 		acc.save();
 		res.redirect('/');
 	});
 	app.get('/attach/accessory/:id', async (req, res) => {
 		const id = req.params.id;
 		const cube = await cubeController.getCubeById(id);
-		const accessories = await getAccessoriesForCube(id);
-		res.render('attachAccessory', { cube, accessories });
+		const cubeAccIdsStrings = cube.accessories.map((acc) =>
+			acc.valueOf().toString()
+		);
+		const accessories = await (await accController.getAccessories()).filter(
+			(acc) => {
+				return !cubeAccIdsStrings.includes(acc._id.valueOf().toString());
+			}
+		);
+		const isThereAcc = !!accessories.length;
+		res.render('attachAccessory', { cube, accessories, isThereAcc });
 	});
 	app.post('/attach/accessory/:id', (req, res) => {
 		const cubeId = req.params.id;
@@ -45,13 +54,15 @@ module.exports = (app) => {
 			body.name,
 			body.description,
 			body.imageUrl,
-			body.difficulty
+			body.difficultyLevel
 		);
 		res.redirect('/');
 	});
 	app.get('/details/:id', async (req, res) => {
 		const id = req.params.id;
 		const cube = await cubeController.getCubeById(id);
+		const accessories = await accController.getAccessoriesForCube(id);
+
 		res.render('details', { cube, accessories });
 	});
 	app.get('*', (req, res) => {

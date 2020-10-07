@@ -1,5 +1,7 @@
 const db = require('../controllers/database');
+const { findByIdAndUpdate } = require('../models/accessory-model');
 const Accessory = require('../models/accessory-model');
+const Cube = require('../models/cube-model');
 
 const getAccessories = async () => {
 	return await db.getAllAccessories();
@@ -20,12 +22,11 @@ const createAccessory = (name, description, imageUrl) => {
 };
 
 const attachAccessory = async (accessoryId, cubeId) => {
-	const cube = await db.getCubeById(cubeId);
-	cube.accessories.push(accessoryId);
-	const accessory = await db.getAccessoryById();
-	accessory.cubes.push(cubeId);
+	const accessory = await Accessory.findById(accessoryId);
+	const cube = await Cube.findByIdAndUpdate(cubeId, {
+		$addToSet: { accessories: accessory },
+	});
 	cube.save();
-	accessory.save();
 };
 
 const getAccessoriesForCube = async (cubeId) => {

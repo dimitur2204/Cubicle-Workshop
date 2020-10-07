@@ -44,9 +44,7 @@ const getAccessoryById = async (id) => {
 const getCubeById = async (id) => {
 	let result;
 	try {
-		result = await Cube.findById(id).select(
-			'_id name difficulty description imageUrl'
-		);
+		result = await Cube.findById(id);
 	} catch (err) {
 		throw err;
 	}
@@ -64,7 +62,8 @@ const findByQueryObj = async (queryObj) => {
 };
 
 const getAccessoriesForCube = async (cubeId) => {
-	const cube = await getCubeById(cubeId).populate('accessories');
+	const cube = await getCubeById(cubeId);
+	await cube.populate('accessories').execPopulate();
 	return cube.accessories;
 };
 
