@@ -1,10 +1,10 @@
 const {
-	getAccessoriesForCube,
 	attachAccessory,
 } = require('../controllers/accessory');
 const cubeController = require('../controllers/cube');
 const accController = require('../controllers/accessory');
 const Accessory = require('../models/accessory-model');
+const Cube = require('../models/cube-model');
 
 module.exports = (app) => {
 	app.get('/', async (req, res) => {
@@ -65,6 +65,17 @@ module.exports = (app) => {
 
 		res.render('details', { cube, accessories });
 	});
+	app.get('/delete/:id', async (req,res) =>{
+		const id = req.params.id;
+		const cube = await cubeController.getCubeById(id);
+		res.render('delete', cube);
+	})
+	app.post('/delete/:id', async (req,res) =>{
+		const id = req.params.id;
+		await Cube.findByIdAndRemove(id,(err) => {
+			res.redirect('/');
+		})
+	})
 	app.get('*', (req, res) => {
 		res.render('404');
 	});

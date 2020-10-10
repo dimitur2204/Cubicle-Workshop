@@ -1,13 +1,7 @@
 const mongoose = require('mongoose');
 const Accessory = require('../models/accessory-model');
 const Cube = require('../models/cube-model');
-const accessory = require('./accessory');
-const connectionString = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cubicle-workshop.cmgb5.mongodb.net/cubicle-workshop?retryWrites=true&w=majority`;
 
-mongoose.connect(connectionString, {
-	useNewUrlParser: true,
-	useUnifiedTopology: true,
-});
 
 const getAllCubes = async () => {
 	let result;
