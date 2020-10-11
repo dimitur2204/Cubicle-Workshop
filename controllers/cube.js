@@ -108,6 +108,27 @@ const postAttachAccessory = async (req,res,next) => {
 	}).catch(next);
 };
 
+const getEditCube = (req,res,next) => {
+	const cubeId = req.params.id;
+	Cube.findById(cubeId).then(cube => {
+		res.render('edit', cube);
+	}).catch(next);
+}
+
+const postEditCube = (req,res,next) => {
+	const id = req.params.id;
+	const {
+		name,
+		description,
+		imageUrl,
+		difficulty
+	} = req.body;
+		Cube.findByIdAndUpdate(id,{name, description,imageUrl,difficulty}).then((cube) => {
+			cube.save();
+			res.redirect('/');
+		}).catch(next);
+}
+
 module.exports = {
 	getCubes,
 	getCubeDetails,
@@ -117,5 +138,7 @@ module.exports = {
 	getAttachAccessories,
 	postAttachAccessory,
 	getDeleteCube,
-	postDeleteCube
+	postDeleteCube,
+	getEditCube,
+	postEditCube
 };
