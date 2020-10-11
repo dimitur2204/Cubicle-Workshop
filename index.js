@@ -11,6 +11,7 @@ const connectionString = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_
 mongoose.connect(connectionString, {
 	useNewUrlParser: true,
 	useUnifiedTopology: true,
+	useFindAndModify:false
 });
 
 app.listen(
