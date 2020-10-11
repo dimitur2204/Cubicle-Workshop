@@ -15,5 +15,8 @@ router.post('/delete/:id', cubeController.postDeleteCube);
 router.get('/create', cubeController.getCreateCube);
 router.post('/create', cubeController.postCreateCube);
 
+router.get('/edit/:id', cubeController.getEditCube);
+router.post('/edit/:id', cubeController.postEditCube);
+
 module.exports = router;
 
