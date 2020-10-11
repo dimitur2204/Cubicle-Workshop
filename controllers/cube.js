@@ -42,13 +42,15 @@ const postCreateCube = (req,res,next) => {
 	name,
 	description,
 	imageUrl,
-	difficulty
+	difficulty,
 } = req.body;
+	const creatorId = res.locals.user._id;
 	const cube = new Cube({
 		name,
 		description,
 		imageUrl,
 		difficulty,
+		creatorId
 	});
 	cube.save().then(() => {
 		res.redirect('/');

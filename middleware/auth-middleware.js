@@ -11,9 +11,9 @@ const requireAuth = (req, res, next) => {
                 res.redirect('/login');
                 return;
             }
-            console.log(decodedToken);
             next();
         });   
+        return;
     }
 
     res.redirect('/login');
@@ -34,6 +34,7 @@ const checkUser = (req,res,next) => {
             res.locals.user = user;
             next();
         });
+        return;
     }
     res.locals.user = null;
     next();

@@ -47,10 +47,11 @@ const postLogin = async (req,res) => {
             const user = await User.login(email,password);
             const token = createToken(user._id);
             res.cookie('jwt',token, { httpOnly:true, maxAge: MAX_AGE_SECONDS * 1000});
-            res.status(200).json(user._id);
+            res.status(200).redirect('/');
         } catch (error) {
             const errors = handleErrors(error);
             res.status(400).json({errors});
+            return;
         }
 }
 
@@ -69,9 +70,10 @@ const postRegister = async (req,res) => {
         const user = await User.create({email,password});
         const token = createToken(user._id);
         res.cookie('jwt',token, { httpOnly:true, maxAge: MAX_AGE_SECONDS * 1000});
-        res.status(201).json({user:user._id});
+        res.status(201).redirect('/');
     }catch(error){
         res.status(401).json(handleErrors(error));
+        return;
     }
 }
 
