@@ -1,43 +1,45 @@
-const db = require('../controllers/database');
-const { findByIdAndUpdate } = require('../models/accessory-model');
 const Accessory = require('../models/accessory-model');
-const Cube = require('../models/cube-model');
 
 const getAccessories = async () => {
-	return await db.getAllAccessories();
+	let result;
+	try {
+		result = await Accessory.find({});
+	} catch (err) {
+		throw err;
+	}
+	return result;
 };
 
 const getAccessoryById = async (id) => {
-	const accessory = db.getAccessoryById(id);
-	return accessory;
+	let result;
+	try {
+		result = await Accessory.findById(id).select(
+			'_id name description imageUrl'
+		);
+	} catch (err) {
+		throw err;
+	}
+	return result;
 };
 
-const createAccessory = (name, description, imageUrl) => {
-	const accessory = new Accessory({
-		name,
-		description,
-		imageUrl,
-	});
-	accessory.save();
+const getCreateAccessory = (_, res) => {
+	res.render('createAccessory');
 };
 
-const attachAccessory = async (accessoryId, cubeId) => {
-	const accessory = await Accessory.findById(accessoryId);
-	const cube = await Cube.findByIdAndUpdate(cubeId, {
-		$addToSet: { accessories: accessory },
-	});
-	cube.save();
+const postCreateAccessory = (req, res, next) => {
+	const { name, description, imageUrl } = req.body;
+	const acc = new Accessory({ name, description, imageUrl });
+	acc.save().then(() => {
+		res.redirect('/');
+	}).catch(next);
+	
 };
 
-const getAccessoriesForCube = async (cubeId) => {
-	const accessories = await db.getAccessoriesForCube(cubeId);
-	return accessories;
-};
+
 
 module.exports = {
 	getAccessories,
 	getAccessoryById,
-	createAccessory,
-	attachAccessory,
-	getAccessoriesForCube,
+	postCreateAccessory,
+	getCreateAccessory
 };

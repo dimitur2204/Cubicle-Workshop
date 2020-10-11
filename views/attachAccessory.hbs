@@ -5,10 +5,10 @@
         <img class="cube" src="{{cube.imageUrl}}">
         <form action="/attach/accessory/{{cube._id}}" method="POST">
           <label for="accessory">Accessories</label>
-            {{#if isThereAcc}}
+            {{#if areThereAcc}}
           <select id="accessory" name="accId">
 
-              {{#each accessories}}
+              {{#each unaatachedAccessories}}
               <option value="{{this._id}}">{{this.name}}</option>
               {{/each}}
               <input type="submit" value="Attach">
