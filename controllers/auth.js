@@ -1,4 +1,7 @@
 const User = require('../models/user-model');
+const jwt = require('jsonwebtoken')
+
+const MAX_AGE_SECONDS = 365 * 3 * 24 * 60 * 60;
 
 const handleErrors = (error) => {
     const errors = { email: '', password:''};
@@ -6,6 +9,10 @@ const handleErrors = (error) => {
     if (error.code === 11000) {
         errors.email = "That email already exists";
         return errors;
+    }
+
+    if (error.message.includes('Passwords do not match')) {
+        errors.password = error.message;
     }
 
     if (error.message.includes('User validation failed')) {
@@ -16,12 +23,24 @@ const handleErrors = (error) => {
     return errors;
 }
 
+const createToken = (id) => {
+    return jwt.sign({ id }, process.env.JWT_SECRET, {
+        expiresIn: MAX_AGE_SECONDS
+    });
+}
+
 const getLogin = (_,res) => {
     res.render('login');
 }
 
-const postLogin = (req,res,next) => {
-
+const postLogin = async (req,res,next) => {
+    const {email,password} = req.body;
+        try {
+            const user = await User.login(email,password);
+            res.status(200).json(user._id);
+        } catch (error) {
+            res.status(400).json({});
+        }
 }
 
 const getRegister = (_,res) => {
@@ -29,10 +48,17 @@ const getRegister = (_,res) => {
 }
 
 const postRegister = async (req,res) => {
-    const {email,password} = req.body;
+    const {email,password,repeatPassword} = req.body;
+    if (password !== repeatPassword) {
+        res.status(401).json(handleErrors({message:'Passwords do not match'}));
+        return;
+    }
+
     try{
         const user = await User.create({email,password});
-        res.status(201).json(user);
+        const token = createToken(user._id);
+        res.cookie('jwt',token, { httpOnly:true, maxAge: MAX_AGE_SECONDS * 1000});
+        res.status(201).json({user:user._id});
     }catch(error){
         res.status(401).json(handleErrors(error));
     }
