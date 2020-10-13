@@ -13,7 +13,7 @@ const userSchema = new mongoose.Schema({
     password:{
         type:String,
         required:[true,'You should provide a password'],
-        minlength:[8,'Your password should be atleast 6 symbols long'],
+        minlength:[8,'Your password should be atleast 8 symbols long'],
     }
 });
 
@@ -34,5 +34,6 @@ userSchema.statics.login = async function(email,password){
     }
     throw Error('Incorrect email');
 }
+
 
 module.exports = mongoose.model('User',userSchema);

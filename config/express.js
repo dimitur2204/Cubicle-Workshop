@@ -7,7 +7,7 @@ module.exports = (app) => {
 		extname: '.hbs',
 		defaultLayout:'main',
 		helpers:{
-			user:function (req, res) {
+			user:function (_, res) {
 				return res.locals.user;
 			  }
 		} 

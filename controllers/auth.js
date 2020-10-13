@@ -3,42 +3,14 @@ const jwt = require('jsonwebtoken')
 
 const MAX_AGE_SECONDS = 365 * 3 * 24 * 60 * 60;
 
-const handleErrors = (error) => {
-    const errors = { email: '', password:''};
-
-    if (error.code === 11000) {
-        errors.email = "That email already exists";
-        return errors;
-    }
-
-    if (error.message.includes('Passwords do not match')) {
-        errors.password = error.message;
-    }
-
-    if (error.message.includes('Incorrect password')) {
-        errors.password = error.message;
-    }
-
-    if (error.message.includes('Incorrect email')) {
-        errors.email = error.message;
-    }
-
-    if (error.message.includes('User validation failed')) {
-        Object.values(error.errors).forEach(({properties}) => {
-            errors[properties.path] = properties.message;
-        });
-    }
-    return errors;
-}
-
 const createToken = (id) => {
     return jwt.sign({ id }, process.env.JWT_SECRET, {
         expiresIn: MAX_AGE_SECONDS
     });
 }
 
-const getLogin = (_,res) => {
-    res.render('login');
+const getLogin = (req,res) => {
+    res.render('login',{errorMessage:req.query.message});
 }
 
 const postLogin = async (req,res) => {
@@ -49,20 +21,19 @@ const postLogin = async (req,res) => {
             res.cookie('jwt',token, { httpOnly:true, maxAge: MAX_AGE_SECONDS * 1000});
             res.status(200).redirect('/');
         } catch (error) {
-            const errors = handleErrors(error);
-            res.status(400).json({errors});
+            res.status(401).redirect(`/login?error=true&message="${error.message}"`);
             return;
         }
 }
 
-const getRegister = (_,res) => {
-    res.render('register');
+const getRegister = (req,res) => {
+    res.render('register',{errorMessage:req.query.message});
 }
 
 const postRegister = async (req,res) => {
     const {email,password,repeatPassword} = req.body;
     if (password !== repeatPassword) {
-        res.status(401).json(handleErrors({message:'Passwords do not match'}));
+        res.status(401).redirect(`/register?error=true&message="Passwords do not match"`);
         return;
     }
 
@@ -72,7 +43,7 @@ const postRegister = async (req,res) => {
         res.cookie('jwt',token, { httpOnly:true, maxAge: MAX_AGE_SECONDS * 1000});
         res.status(201).redirect('/');
     }catch(error){
-        res.status(401).json(handleErrors(error));
+        res.status(401).redirect(`/register?error=true&message="${error.message}"`);
         return;
     }
 }

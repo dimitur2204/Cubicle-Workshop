@@ -15,7 +15,7 @@ const getCubes = async (req,res,next) => {
 			$lte: to || Number.MAX_SAFE_INTEGER,
 		},
 	}).then((cubes) => {
-		res.render('index', { cubes });
+		res.render('index', { cubes,errorMessage:query.message });
 	}).catch(next);
 	
 };
@@ -26,15 +26,15 @@ const getCubeDetails = async (req,res,next) => {
 		const id = req.params.id;
 		const cube = await Cube.findById(id);
 		const accessories = await getAccessoriesForCube(id);
-		res.render('details', { cube, accessories });
+		res.render('details', { cube, accessories,errorMessage:req.query.message });
 	}catch(error){
 		next(error);
 	}
 };
 
 
-const getCreateCube = (_, res) => {
-	res.render('create');
+const getCreateCube = (req, res) => {
+	res.render('create',{errorMessage:req.query.message});
 };
 
 const postCreateCube = (req,res,next) => {
@@ -54,7 +54,9 @@ const postCreateCube = (req,res,next) => {
 	});
 	cube.save().then(() => {
 		res.redirect('/');
-	}).catch(next);
+	}).catch(err => {
+		res.status(401).redirect(`/create?error=true&message="${err.message}"`);
+	});
 };
 
 const getAccessoriesForCube = async (cubeId) => {
@@ -77,7 +79,7 @@ const getAttachAccessories = async (req,res,next) => {
 			}
 		);
 		const areThereAcc = !!unaatachedAccessories.length;
-		res.render('attachAccessory', { cube, unaatachedAccessories, areThereAcc });
+		res.render('attachAccessory', { cube, unaatachedAccessories, areThereAcc, errorMessage:req.query.message });
 	} catch (error) {
 		next(error);
 	}
@@ -86,7 +88,7 @@ const getAttachAccessories = async (req,res,next) => {
 const getDeleteCube = (req,res,next) =>{
 		const id = req.params.id;
 		Cube.findById(id).then((cube) => {
-			res.render('delete', cube);
+			res.render('delete', {cube,errorMessage:req.query.message});
 		}).catch(next);
 }
 
@@ -113,7 +115,7 @@ const postAttachAccessory = async (req,res,next) => {
 const getEditCube = (req,res,next) => {
 	const cubeId = req.params.id;
 	Cube.findById(cubeId).then(cube => {
-		res.render('edit', cube);
+		res.render('edit', {cube, errorMessage:req.query.message});
 	}).catch(next);
 }
 
@@ -128,7 +130,9 @@ const postEditCube = (req,res,next) => {
 		Cube.findByIdAndUpdate(id,{name, description,imageUrl,difficulty}).then((cube) => {
 			cube.save();
 			res.redirect('/');
-		}).catch(next);
+		}).catch((err) => {
+			res.status(401).redirect(`/edit?error=true&message="${err.message}"`);
+		});
 }
 
 module.exports = {
