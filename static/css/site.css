@@ -238,6 +238,22 @@ h2{
     text-align: center;
 }
 
+#notifications {
+    margin: 0 auto;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    text-align: center;
+    width: 50%;
+    padding: 0.5%;
+    margin-top: 2%;
+    margin-bottom: 2%;
+    background: rgb(231, 118, 118);
+    color: white;
+    border-radius: 5px;
+    text-decoration: underline;
+}
+
+
 .accessories .accessory{
     display: inline-block;
     background-color: #f3f3f2;

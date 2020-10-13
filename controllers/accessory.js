@@ -22,8 +22,8 @@ const getAccessoryById = async (id) => {
 	return result;
 };
 
-const getCreateAccessory = (_, res) => {
-	res.render('createAccessory');
+const getCreateAccessory = (req, res) => {
+	res.render('createAccessory',{errorMessage:req.query.message});
 };
 
 const postCreateAccessory = (req, res, next) => {
@@ -31,7 +31,9 @@ const postCreateAccessory = (req, res, next) => {
 	const acc = new Accessory({ name, description, imageUrl });
 	acc.save().then(() => {
 		res.redirect('/');
-	}).catch(next);
+	}).catch(err => {
+		res.status(401).redirect(`/create/accessory?error=true&message="${err.message}"`);
+	});
 	
 };
 
